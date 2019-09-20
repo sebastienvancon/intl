@@ -8,7 +8,7 @@
 library intl_helpers;
 
 import 'dart:async';
-import 'package:intl/intl.dart';
+import '../intl.dart';
 
 /// Type for the callback action when a message translation is not found.
 typedef MessageIfAbsent(String message_str, List<Object> args);

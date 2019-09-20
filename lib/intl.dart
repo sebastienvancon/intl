@@ -28,7 +28,7 @@ import 'number_symbols.dart';
 import 'number_symbols_data.dart';
 import 'src/date_format_internal.dart';
 import 'src/intl_helpers.dart';
-import 'package:intl/src/plural_rules.dart' as plural_rules;
+import 'src/plural_rules.dart' as plural_rules;
 
 part 'src/intl/bidi_formatter.dart';
 part 'src/intl/bidi_utils.dart';
@@ -180,10 +180,11 @@ class Intl {
           Map<String, Object> examples,
           String locale,
           String name,
+          String sufix :'',
           List<Object> args,
           String meaning,
           bool skip}) =>
-      _message(message_str, locale, name, args, meaning);
+      _message(message_str, locale, name + sufix, args, meaning);
 
   /// Omit the compile-time only parameters so dart2js can see to drop them.
   @pragma('dart2js:noInline')

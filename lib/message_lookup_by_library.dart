@@ -12,8 +12,8 @@
 /// examples.
 library message_lookup_by_library;
 
-import 'package:intl/intl.dart';
-import 'package:intl/src/intl_helpers.dart';
+import 'intl.dart';
+import 'src/intl_helpers.dart';
 
 /// This is a message lookup mechanism that delegates to one of a collection
 /// of individual [MessageLookupByLibrary] instances.
@@ -67,12 +67,22 @@ class CompositeMessageLookup implements MessageLookup {
   /// [findLocale] will be called and the result stored as the lookup
   /// mechanism for that locale.
   void addLocale(String localeName, Function findLocale) {
-    if (localeExists(localeName)) return;
     var canonical = Intl.canonicalizedLocale(localeName);
     var newLocale = findLocale(canonical);
+
     if (newLocale != null) {
-      availableMessages[localeName] = newLocale;
-      availableMessages[canonical] = newLocale;
+      if (localeExists(localeName)) {
+        Map<String, dynamic> map = Map();
+        map.addAll((newLocale as MessageLookupByLibrary).messages);
+        map.addAll(availableMessages[localeName].messages);
+        MessageCustom localCustom = MessageCustom(map);
+
+        availableMessages[localeName] = localCustom;
+        availableMessages[canonical] = localCustom;
+      } else {
+        availableMessages[localeName] = newLocale;
+        availableMessages[canonical] = newLocale;
+      }
       // If there was already a failed lookup for [newLocale], null the cache.
       if (_lastLocale == newLocale) {
         _lastLocale = null;
@@ -143,4 +153,17 @@ abstract class MessageLookupByLibrary {
   /// Return a function that returns the given string.
   /// An optimization for dart2js, used from the generated code.
   static simpleMessage(translatedString) => () => translatedString;
+}
+
+class MessageCustom extends MessageLookupByLibrary {
+  Map<String, dynamic> mes;
+
+  MessageCustom(Map<String, dynamic> mess) {
+    mes = mess;
+  }
+
+  String get localeName => 'messages';
+
+  @override
+  Map<String, dynamic> get messages => mes;
 }
